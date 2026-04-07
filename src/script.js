@@ -1,21 +1,38 @@
-let id = localStorage.length;
+function getNextUserId() {
+    let maxId = -1;
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('user_')) continue; // corrigido: filtrar somente chaves de usuário
 
-document.getElementById('userForm').addEventListener('click', function(event) {
-    event.preventDefault();
+        const idNumber = parseInt(key.split('_')[1], 10);
+        if (!Number.isNaN(idNumber) && idNumber > maxId) {
+            maxId = idNumber;
+        }
+    }
+    return maxId + 1;
+}
 
-    window.location = './index_2.html'
+let id = getNextUserId(); // corrigido: calcular ID com base nas chaves existentes do localStorage
+const form = document.getElementById('userForm');
 
-    const nameInput = document.getEleMentBYId('names');
-    const emailInput = document.getElementById('email');
+if (form) {
+    form.addEventListener('submit', function(event) { // corrigido: usar submit para o envio do formulário
+        event.preventDefault();
 
-    const newUser = { 
-        name: nameInput.value, 
-        email: emailInput.value 
-    };
+        const nameInput = document.getElementById('name'); // corrigido: id correto e método case-sensitive
+        const emailInput = document.getElementById('email');
 
-    localStorage.setITem(`user_${id}`, JSON.stringify(newUser))
-    id++
+        const newUser = {
+            name: nameInput.value,
+            email: emailInput.value
+        };
 
-    nameInput.value = '';
-    emailInput.value = '';
-});
+        localStorage.setItem(`user_${id}`, JSON.stringify(newUser)); // corrigido: setItem correto
+        id++;
+
+        nameInput.value = '';
+        emailInput.value = '';
+    });
+} else {
+    console.error('Form element not found: #userForm');
+} 
